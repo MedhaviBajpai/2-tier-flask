@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'dev' }
 
     stages {
         stage('Code Clone Stage') {
@@ -38,13 +38,14 @@ pipeline {
 
         stage('Code Deploy Stage') {
             steps {
-                sh 'docker compose pull' // optional to pull updated image
+                sh 'docker compose pull'
                 sh 'docker compose up -d'
                 echo 'Code deploy done...'
             }
         }
     }
 }
+
 // @Library("Shared") _
 // pipeline{
     
