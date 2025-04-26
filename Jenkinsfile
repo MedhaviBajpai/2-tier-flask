@@ -1,5 +1,5 @@
 pipeline {
-    agent any;
+    agent any
 
     stages {
         stage('Code Clone Stage') {
@@ -22,13 +22,6 @@ pipeline {
             }
         }
 
-        stage('Code Deploy Stage') {
-            steps {
-                sh 'docker compose up -d'
-                echo 'Code deploy done...'
-            }
-        }
-
         stage('Docker Push') {
             steps {
                 withCredentials([usernamePassword(
@@ -37,9 +30,17 @@ pipeline {
                     passwordVariable: "dockerHubPass"
                 )]) {
                     sh "docker login -u $dockerHubUsr -p $dockerHubPass"
-                    sh "docker image tag two-tier-flask-app $dockerHubUsr/two-tier-flask-app:latest"
+                    sh "docker tag two-tier-flask-app $dockerHubUsr/two-tier-flask-app:latest"
                     sh "docker push $dockerHubUsr/two-tier-flask-app:latest"
                 }
+            }
+        }
+
+        stage('Code Deploy Stage') {
+            steps {
+                sh 'docker compose pull' // optional to pull updated image
+                sh 'docker compose up -d'
+                echo 'Code deploy done...'
             }
         }
     }
