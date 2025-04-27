@@ -1,3 +1,6 @@
+.git/
+.gitignore
+*.log
 /app/mysql-data/ca-key.pem
 /app/mysql-data/client-key.pem
 /app/mysql-data/private_key.pem
