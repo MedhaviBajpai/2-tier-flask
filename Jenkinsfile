@@ -15,7 +15,7 @@ pipeline {
                 echo 'Code build done...'
             }
         }
-
+        
         stage('Code Test Stage') {
             steps {
                 echo 'Code test done...'
@@ -35,6 +35,7 @@ pipeline {
                 }
             }
         }
+        
 
         stage('Code Deploy Stage') {
             steps {
