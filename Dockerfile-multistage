@@ -8,10 +8,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc default-libmysqlclient-dev pkg-config curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Trivy to scan for vulnerabilities (optional)
-RUN curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-
-# Copy and install Python dependencies
+# Copy only the necessary files (exclude private keys)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -28,11 +25,8 @@ RUN apt-get update && \
 # Copy dependencies and application code from the builder stage
 COPY --from=builder /usr/local/lib/python3.9/site-packages/ /usr/local/lib/python3.9/site-packages/
 
-# Copy application files (except those in .dockerignore)
+# Copy application files, excluding sensitive ones (ensure .dockerignore excludes them)
 COPY . .
 
-# ------------------- OPTIONAL: Scan Image with Trivy -----------------
-# Scan the image for vulnerabilities after it’s built (optional)
-RUN trivy image --exit-code 1 --severity HIGH,CRITICAL your-image-name
-
+# Set the entrypoint for your app
 CMD ["python", "app.py"]
