@@ -6,4 +6,5 @@
 /app/mysql-data/client-key.pem
 /app/mysql-data/private_key.pem
 /app/mysql-data/server-key.pem
-
+/app/mysql-data/server-key.pem
+/app/mysql-data/private_key.pem
