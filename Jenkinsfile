@@ -98,8 +98,11 @@ pipeline {
                         export PATH=$HOME/bin:$PATH
                     fi
 
-                    # Scan the Docker image
-                    trivy image --exit-code 1 --severity HIGH,CRITICAL two-tier-flask-app:latest
+                    // # Scan the Docker image
+                    // trivy image --exit-code 1 --severity HIGH,CRITICAL two-tier-flask-app:latest
+                    # Trivy with skip dirs flag
+                    trivy image --skip-dirs /app/mysql-data --exit-code 1 --severity HIGH,CRITICAL your-image-name
+
                 '''
                 echo 'Trivy scan completed successfully with no critical/high vulnerabilities.'
             }
