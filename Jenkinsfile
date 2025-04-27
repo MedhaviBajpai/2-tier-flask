@@ -89,11 +89,13 @@ pipeline {
         stage('Trivy Scan Stage') {
             steps {
                 sh '''
-                    # Install Trivy if not present
+                    # Install Trivy to user's home directory if not present
                     if ! command -v trivy &> /dev/null
                     then
                         echo "Trivy not found, installing..."
-                        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+                        mkdir -p $HOME/bin
+                        curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $HOME/bin
+                        export PATH=$HOME/bin:$PATH
                     fi
 
                     # Scan the Docker image
@@ -102,7 +104,7 @@ pipeline {
                 echo 'Trivy scan completed successfully with no critical/high vulnerabilities.'
             }
         }
-        
+
         stage('Code Test Stage') {
             steps {
                 echo 'Code test done...'
