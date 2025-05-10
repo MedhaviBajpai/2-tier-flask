@@ -38,8 +38,4 @@ jobs:
       - name: Tear Down Containners
         run: docker-compose down
 
-      - name: Push Docker Image to Docker Hub
-        run: | docker tag flaskapp-web:latest $IMAGE_NAME:latest
-        docker push $IMAGE_NAME:latest
-
 
