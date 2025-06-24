@@ -14,16 +14,25 @@ app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB', 'default_db')
 mysql = MySQL(app)
 
 def init_db():
-    with app.app_context():
-        cur = mysql.connection.cursor()
-        cur.execute('''
-        CREATE TABLE IF NOT EXISTS messages (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            message TEXT
-        );
-        ''')
-        mysql.connection.commit()  
-        cur.close()
+    for attempt in range(10):
+        try:
+            with app.app_context():
+                cur = mysql.connection.cursor()
+                cur.execute('''
+                CREATE TABLE IF NOT EXISTS messages (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    message TEXT
+                );
+                ''')
+                mysql.connection.commit()  
+                cur.close()
+            print("✅ Database initialized successfully.")
+            break
+        except MySQLdb.OperationalError as e:
+            print(f"⏳ MySQL not ready yet (attempt {attempt + 1}/10). Retrying in 3 seconds...")
+            time.sleep(3)
+    else:
+        raise Exception("❌ Could not connect to MySQL after 10 attempts.")
 
 @app.route('/')
 def hello():
