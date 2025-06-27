@@ -10,7 +10,8 @@ pipeline {
 
         stage("BUILD") {
             steps {
-                sh "docker build -t my-flask-app:latest ."
+               sh "docker build --no-cache -t my-flask-app:latest ."
+
             }
         }
 
