@@ -18,15 +18,33 @@ This project demonstrates the deployment of a simple **two-tier application** co
 ---
 
 📁 File Structure
+
+
 .
 ├── Dockerfile
+
+
 ├── flask-app/
+
+
 │   └── app.py
+
+
 ├── 01-mysql-pv.yaml
+
+
 ├── 02-mysql-pvc.yaml
+
+
 ├── 03-mysql-deployment.yaml
+
+
 ├── 04-flask-deployment.yaml
+
+
 ├── kind-config.yaml
+
+
 └── README.md
 
 
