@@ -73,6 +73,8 @@ Created a Dockerfile for the Flask app.
 Built and loaded the image into KIND:
 
 docker build -t flask-app:latest .
+
+
 kind load docker-image flask-app:latest
 
 ---
@@ -88,16 +90,27 @@ Used ClusterIP type for both services.
 
 ## Applied using:
 kubectl apply -f mysql-pv.yaml
+
+
 kubectl apply -f mysql-pvc.yaml
+
+
 kubectl apply -f mysql-deployment.yaml
+
+
 kubectl apply -f two-tier-deployment.yaml
+
+
 kubectl apply -f two-tier-svc.yaml
+
+
 kubectl apply -f  mysql-svc.yaml
 
 ---
 
 ## ✅ Persistent Volume Setup for MySQL
 Created PersistentVolume (PV) and PersistentVolumeClaim (PVC) to persist MySQL data.
+
 
 Volume mounted to MySQL at /var/lib/mysql
 
@@ -106,6 +119,8 @@ volumeMounts:
 <img width="1917" height="363" alt="Screenshot 2025-07-19 115056" src="https://github.com/user-attachments/assets/d3ac6ece-f29c-463b-a17a-c77edac51942" />
 
   - name: mysql-persistent-storage
+
+  - 
     mountPath: /var/lib/mysql
     
 <img width="1722" height="918" alt="Screenshot 2025-07-19 114827" src="https://github.com/user-attachments/assets/f2485878-1efa-4285-8936-30536583d469" />
@@ -123,6 +138,8 @@ volumeMounts:
 To access Flask app from your local machine:
 
 ssh -i "<path to pem-key>" -L <portnumber>:localhost:<portnumber> ubuntu@<EC2_PUBLIC_IP>
+
+
 kubectl port-forward svc/flask-service 5000:5000
 
 ## Then visit: http://localhost:5000
