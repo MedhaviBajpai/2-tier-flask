@@ -1,130 +1,149 @@
- 
-# Flask App with MySQL Docker Setup
+# 🚀 Two-Tier Flask + MySQL Application on Kubernetes using KIND (ClusterIP Service)
 
-This is a simple Flask app that interacts with a MySQL database. The app allows users to submit messages, which are then stored in the database and displayed on the frontend.
+<img width="1918" height="920" alt="Screenshot 2025-07-19 114652" src="https://github.com/user-attachments/assets/60b8813b-c2c3-4a36-bc86-26c456dcbdf5" />
 
-## Prerequisites
 
-Before you begin, make sure you have the following installed:
+This project demonstrates the deployment of a simple **two-tier application** consisting of a **Flask frontend** and a **MySQL backend** using **Kubernetes** (via KIND) on an **AWS EC2 instance**.
 
-- Docker
-- Git (optional, for cloning the repository)
+---
 
-## Setup
+## 📌 Project Overview
 
-1. Clone this repository (if you haven't already):
+- 🐍 **Flask App**: Python-based REST API that connects to MySQL and serves web content.
+- 🐬 **MySQL DB**: Stores application data.
+- ☸️ **Kubernetes (KIND)**: Local K8s cluster using Docker.
+- 🧠 **ClusterIP Service**: Used to expose services **internally** within the cluster.
+- ☁️ **AWS EC2**: Host VM for KIND cluster (Ubuntu 24.04).
 
-   ```bash
-   git clone https://github.com/your-username/your-repo-name.git
-   ```
+---
 
-2. Navigate to the project directory:
+📁 File Structure
+.
+├── Dockerfile
+├── flask-app/
+│   └── app.py
+├── 01-mysql-pv.yaml
+├── 02-mysql-pvc.yaml
+├── 03-mysql-deployment.yaml
+├── 04-flask-deployment.yaml
+├── kind-config.yaml
+└── README.md
 
-   ```bash
-   cd your-repo-name
-   ```
 
-3. Create a `.env` file in the project directory to store your MySQL environment variables:
 
-   ```bash
-   touch .env
-   ```
-
-4. Open the `.env` file and add your MySQL configuration:
-
-   ```
-   MYSQL_HOST=mysql
-   MYSQL_USER=your_username
-   MYSQL_PASSWORD=your_password
-   MYSQL_DB=your_database
-   ```
-
-## Usage
-
-1. Start the containers using Docker Compose:
-
-   ```bash
-   docker-compose up --build
-   ```
-
-2. Access the Flask app in your web browser:
-
-   - Frontend: http://localhost
-   - Backend: http://localhost:5000
-
-3. Create the `messages` table in your MySQL database:
-
-   - Use a MySQL client or tool (e.g., phpMyAdmin) to execute the following SQL commands:
-   
-     ```sql
-     CREATE TABLE messages (
-         id INT AUTO_INCREMENT PRIMARY KEY,
-         message TEXT
-     );
-     ```
-
-4. Interact with the app:
-
-   - Visit http://localhost to see the frontend. You can submit new messages using the form.
-   - Visit http://localhost:5000/insert_sql to insert a message directly into the `messages` table via an SQL query.
-
-## Cleaning Up
-
-To stop and remove the Docker containers, press `Ctrl+C` in the terminal where the containers are running, or use the following command:
-
-```bash
-docker-compose down
-```
-
-## To run this two-tier application using  without docker-compose
-
-- First create a docker image from Dockerfile
-```bash
-docker build -t flaskapp .
-```
-
-- Now, make sure that you have created a network using following command
-```bash
-docker network create twotier
-```
-
-- Attach both the containers in the same network, so that they can communicate with each other
-
-i) MySQL container 
-```bash
-docker run -d \
-    --name mysql \
-    -v mysql-data:/var/lib/mysql \
-    --network=twotier \
-    -e MYSQL_DATABASE=mydb \
-    -e MYSQL_ROOT_PASSWORD=admin \
-    -p 3306:3306 \
-    mysql:5.7
+## 🧱 Architecture
 
 ```
-ii) Backend container
-```bash
-docker run -d \
-    --name flaskapp \
-    --network=twotier \
-    -e MYSQL_HOST=mysql \
-    -e MYSQL_USER=root \
-    -e MYSQL_PASSWORD=admin \
-    -e MYSQL_DB=mydb \
-    -p 5000:5000 \
-    flaskapp:latest
-
+Client (Your Local Machine via Port Forwarding)
+    |
+    | [localhost:5000]
+    |
+AWS EC2 Instance (via SSH Port Forwarding)
+ └── KIND Cluster (3 nodes: 1 control-plane, 2 workers)
+      ├── Flask Deployment + ClusterIP Service
+      └── MySQL Deployment + ClusterIP Service
 ```
 
-## Notes
+---
 
-- Make sure to replace placeholders (e.g., `your_username`, `your_password`, `your_database`) with your actual MySQL configuration.
+## 🔧Steps Performed
 
-- This is a basic setup for demonstration purposes. In a production environment, you should follow best practices for security and performance.
+✅ EC2 Setup
+Launched an Ubuntu EC2 instance.
 
-- Be cautious when executing SQL queries directly. Validate and sanitize user inputs to prevent vulnerabilities like SQL injection.
+Opened required security group ports (SSH, 5000).
 
-- If you encounter issues, check Docker logs and error messages for troubleshooting.
+Installed Docker, kubectl, kind.
 
-```
+---
 
+## ✅ KIND Cluster Setup
+
+kind create cluster --config kind-config.yaml
+
+kubectl get nodes
+
+---
+
+
+## ✅ Docker Images
+
+Created a Dockerfile for the Flask app.
+
+Built and loaded the image into KIND:
+
+docker build -t flask-app:latest .
+kind load docker-image flask-app:latest
+
+---
+
+## ✅ Kubernetes Manifests
+Deployment and Service YAMLs created for both:
+
+Flask (frontend)
+
+MySQL (backend)
+
+Used ClusterIP type for both services.
+
+## Applied using:
+kubectl apply -f mysql-pv.yaml
+kubectl apply -f mysql-pvc.yaml
+kubectl apply -f mysql-deployment.yaml
+kubectl apply -f two-tier-deployment.yaml
+kubectl apply -f two-tier-svc.yaml
+kubectl apply -f  mysql-svc.yaml
+
+---
+
+## ✅ Persistent Volume Setup for MySQL
+Created PersistentVolume (PV) and PersistentVolumeClaim (PVC) to persist MySQL data.
+
+Volume mounted to MySQL at /var/lib/mysql
+
+
+volumeMounts:
+<img width="1917" height="363" alt="Screenshot 2025-07-19 115056" src="https://github.com/user-attachments/assets/d3ac6ece-f29c-463b-a17a-c77edac51942" />
+
+  - name: mysql-persistent-storage
+    mountPath: /var/lib/mysql
+    
+<img width="1722" height="918" alt="Screenshot 2025-07-19 114827" src="https://github.com/user-attachments/assets/f2485878-1efa-4285-8936-30536583d469" />
+
+<img width="1207" height="257" alt="Screenshot 2025-07-19 114834" src="https://github.com/user-attachments/assets/7383a9e3-40d6-41f0-9cca-ae98e1272a92" />
+
+
+    
+
+---
+
+## MOST IMP PART FOR KIND CONFIG
+
+✅ Port Forwarding (to Access Flask)
+To access Flask app from your local machine:
+
+ssh -i "<path to pem-key>" -L <portnumber>:localhost:<portnumber> ubuntu@<EC2_PUBLIC_IP>
+kubectl port-forward svc/flask-service 5000:5000
+
+## Then visit: http://localhost:5000
+
+
+<img width="1305" height="400" alt="Screenshot 2025-07-19 114710" src="https://github.com/user-attachments/assets/a8a1e0d5-b682-4774-b69a-e7697c93be29" />
+
+---
+
+## ✅ Scaling
+To scale the Flask deployment:
+
+kubectl scale deployment flask-deployment --replicas=5
+
+<img width="1538" height="411" alt="Screenshot 2025-07-19 115016" src="https://github.com/user-attachments/assets/10c42813-bea9-4bf8-ae7f-d08e6d2f2c71" />
+
+
+---
+
+## ✍️ Author
+Suyash Dahitule
+💼 #90DaysOfDevOps
+🔗 LinkedIn
+📌 AWS EC2 | KIND | K8s | Docker | Flask | MySQL
