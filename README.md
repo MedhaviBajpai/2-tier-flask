@@ -24,21 +24,6 @@ Before you begin, make sure you have the following installed:
    cd your-repo-name
    ```
 
-3. Create a `.env` file in the project directory to store your MySQL environment variables:
-
-   ```bash
-   touch .env
-   ```
-
-4. Open the `.env` file and add your MySQL configuration:
-
-   ```
-   MYSQL_HOST=mysql
-   MYSQL_USER=your_username
-   MYSQL_PASSWORD=your_password
-   MYSQL_DB=your_database
-   ```
-
 ## Usage
 
 1. Start the containers using Docker Compose:
